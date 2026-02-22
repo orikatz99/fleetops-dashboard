@@ -3,6 +3,7 @@ import { initializeRobots } from "./simulation/store";
 import { startEngine } from "./simulation/engine";
 import { startMissionGenerator } from "./simulation/missionGenerator";
 import robotsRouter from "./routes/robots.routes";
+import missionsRouter from "./routes/missions.routes";
 
 const app = express();
 const PORT = 3000;
@@ -16,6 +17,8 @@ app.get("/", (_req, res) => {
 });
 
 app.use("/robots", robotsRouter);
+
+app.use("/missions", missionsRouter);
 
 // Initialization
 initializeRobots(100);
