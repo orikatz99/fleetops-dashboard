@@ -4,11 +4,13 @@ import { startEngine } from "./simulation/engine";
 import { startMissionGenerator } from "./simulation/missionGenerator";
 import robotsRouter from "./routes/robots.routes";
 import missionsRouter from "./routes/missions.routes";
+import cors from "cors";
 
 const app = express();
 const PORT = 3000;
 
 // Middleware
+app.use(cors());         
 app.use(express.json());
 
 // Routes
@@ -17,7 +19,6 @@ app.get("/", (_req, res) => {
 });
 
 app.use("/robots", robotsRouter);
-
 app.use("/missions", missionsRouter);
 
 // Initialization
