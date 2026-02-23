@@ -1,30 +1,7 @@
 import { useEffect, useState } from "react";
-
-type RobotStatus =
-  | "idle"
-  | "assigned"
-  | "en_route"
-  | "delivering"
-  | "completed"
-  | "failed"
-  | "cancelled";
-
-interface Robot {
-  id: string;
-  status: RobotStatus;
-  currentMissionId: string | null;
-}
-
-const statusColors: Record<RobotStatus, string> = {
-  idle: "#9CA3AF",
-  assigned: "#5B8DEF",
-  en_route: "#4CB8C4",
-  delivering: "#E8A03C",
-  completed: "#52B788",
-  failed: "#D65A5A",
-  cancelled: "#9D79BC",
-};
-
+import KPICards from "./components/KPICards";
+import RobotsTable from "./components/RobotsTable";
+import type { Robot } from "./components/RobotsTable";
 function App() {
   const [robots, setRobots] = useState<Robot[]>([]);
 
@@ -47,72 +24,33 @@ function App() {
     fetchRobots();
   };
 
+  const total = robots.length;
+  const idle = robots.filter(r => r.status === "idle").length;
+  const delivering = robots.filter(r => r.status === "delivering").length;
+  const failed = robots.filter(r => r.status === "failed").length;
+
   return (
     <div style={pageStyle}>
       <div style={cardStyle}>
         <h1 style={titleStyle}>FleetOps Dashboard</h1>
         <p style={subtitleStyle}>
-          Total Robots: {robots.length}
+          Live fleet monitoring interface
         </p>
 
-        <table style={tableStyle}>
-          <thead>
-            <tr>
-              <th style={thStyle}>Robot ID</th>
-              <th style={thStyle}>Status</th>
-              <th style={thStyle}>Mission</th>
-              <th style={thStyle}>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {robots.map((robot) => (
-              <tr key={robot.id} style={rowStyle}>
-                <td style={tdStyle}>{robot.id}</td>
-                <td style={tdStyle}>
-                  <span
-                    style={{
-                      padding: "6px 14px",
-                      borderRadius: "999px",
-                      backgroundColor: statusColors[robot.status],
-                      color: "white",
-                      fontSize: "12px",
-                      fontWeight: 500,
-                    }}
-                  >
-                    {robot.status}
-                  </span>
-                </td>
-                <td style={tdStyle}>
-                  {robot.currentMissionId || "-"}
-                </td>
-                <td style={tdStyle}>
-  {robot.currentMissionId && (
-    <button
-      onClick={() => cancelMission(robot.id)}
-      style={{
-        padding: "6px 16px",
-        borderRadius: "8px",
-        border: "none",
-        backgroundColor: "#C65A5A",
-        color: "white",
-        cursor: "pointer",
-        transition: "0.2s ease",
-      }}
-    >
-      Cancel
-    </button>
-  )}
-</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <KPICards
+          total={total}
+          idle={idle}
+          delivering={delivering}
+          failed={failed}
+        />
+
+        <RobotsTable robots={robots} onCancel={cancelMission} />
       </div>
     </div>
   );
 }
 
-/* -------- Styles -------- */
+/* Layout Styles */
 
 const pageStyle: React.CSSProperties = {
   minHeight: "100vh",
@@ -126,7 +64,7 @@ const pageStyle: React.CSSProperties = {
 
 const cardStyle: React.CSSProperties = {
   width: "1100px",
-  backgroundColor: "#F5EFE6", // soft beige card
+  backgroundColor: "#F5EFE6",
   padding: "50px",
   borderRadius: "16px",
   boxShadow: "0 10px 30px rgba(0,0,0,0.05)",
@@ -143,29 +81,6 @@ const subtitleStyle: React.CSSProperties = {
   textAlign: "center",
   color: "#6B7280",
   marginBottom: "40px",
-};
-
-const tableStyle: React.CSSProperties = {
-  width: "100%",
-  borderCollapse: "collapse",
-};
-
-const thStyle: React.CSSProperties = {
-  textAlign: "left",
-  padding: "14px",
-  borderBottom: "1px solid #E0D6C8",
-  fontSize: "14px",
-  color: "#5C5C5C",
-};
-
-const tdStyle: React.CSSProperties = {
-  padding: "14px",
-  borderBottom: "1px solid #E8DFD3",
-  color: "#2C2C2C",
-};
-
-const rowStyle: React.CSSProperties = {
-  transition: "background 0.2s ease",
 };
 
 export default App;
